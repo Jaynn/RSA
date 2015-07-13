@@ -8,12 +8,14 @@
 
 /* Begin PBXBuildFile section */
 		A3587F491B536FFA00A54C12 /* RSA.h in Headers */ = {isa = PBXBuildFile; fileRef = A3587F481B536FFA00A54C12 /* RSA.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		A3D13B9D1B538D9C00EC63D3 /* RSA.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3D13B9C1B538D9C00EC63D3 /* RSA.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		A3587F451B536FFA00A54C12 /* RSA.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RSA.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A3587F481B536FFA00A54C12 /* RSA.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RSA.h; sourceTree = "<group>"; };
 		A3587F4A1B536FFA00A54C12 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A3D13B9C1B538D9C00EC63D3 /* RSA.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RSA.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -48,6 +50,7 @@
 			children = (
 				A3587F481B536FFA00A54C12 /* RSA.h */,
 				A3587F4A1B536FFA00A54C12 /* Info.plist */,
+				A3D13B9C1B538D9C00EC63D3 /* RSA.swift */,
 			);
 			path = RSA;
 			sourceTree = "<group>";
@@ -90,6 +93,7 @@
 		A3587F3C1B536FFA00A54C12 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastSwiftUpdateCheck = 0700;
 				LastUpgradeCheck = 0700;
 				ORGANIZATIONNAME = "肇庆市创威发展有限公司";
 				TargetAttributes = {
@@ -130,6 +134,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A3D13B9D1B538D9C00EC63D3 /* RSA.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -228,6 +233,7 @@
 		A3587F5A1B536FFA00A54C12 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -238,12 +244,14 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.chinaway.RSA;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
 		A3587F5B1B536FFA00A54C12 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -276,6 +284,7 @@
 				A3587F5B1B536FFA00A54C12 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
