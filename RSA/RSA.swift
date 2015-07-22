@@ -9,10 +9,13 @@
 import Foundation
 
 
-public enum RSAErrorType : ErrorType {
+public enum Error : ErrorType {
     case CertificateBase64DecodedFailure
+    case SecCertificateCreateFailure(NSData)
     case SecTrustCreateFailure(OSStatus)
+    case SecTrustGetFailure(UnsafeMutablePointer<SecTrust?>)
     case SecTrustEvaluateFailure(OSStatus)
+    case SecTrustCopyPublicKeyFailure(SecTrust)
     case SecKeyEncryptFailure(OSStatus)
 }
 
@@ -21,12 +24,12 @@ public enum BlockMode {
 }
 
 private let DefaultBlockMode = BlockMode.ECB
-private let DefaultPadding = SecPadding(kSecPaddingPKCS1)
+private let DefaultPadding = SecPadding.PKCS1
 
 /// 从X.509证书中提取公钥，使用公钥对数据进行加密。
 public func encrypt(data: NSData, certificateBase64String: String, blockMode: BlockMode = DefaultBlockMode, padding: SecPadding = DefaultPadding) throws -> NSData {
     guard let certificate = NSData(base64EncodedString: certificateBase64String, options: NSDataBase64DecodingOptions()) else {
-        throw RSAErrorType.CertificateBase64DecodedFailure
+        throw Error.CertificateBase64DecodedFailure
     }
     return try encrypt(data, certificate: certificate, blockMode: blockMode, padding: padding)
 }
@@ -38,20 +41,26 @@ public func encrypt(data: NSData, certificate: NSData, blockMode: BlockMode = De
 }
 
 /// 从X.509证书中提取公钥。
-public func publicKeyFromCertificate(certificate: NSData) throws -> SecKeyRef {
-    let certificate = SecCertificateCreateWithData(kCFAllocatorDefault, certificate as CFData).takeUnretainedValue()
-    let policy = SecPolicyCreateBasicX509().takeUnretainedValue()
-    var unmanagedTrust : Unmanaged<SecTrust>? = nil
-    let status = SecTrustCreateWithCertificates(certificate, policy, &unmanagedTrust)
-    if (status != 0) {
-        throw RSAErrorType.SecTrustCreateFailure(status)
+public func publicKeyFromCertificate(certificateData: NSData) throws -> SecKeyRef {
+    guard let certificate = SecCertificateCreateWithData(kCFAllocatorDefault, certificateData as CFData) else {
+        throw Error.SecCertificateCreateFailure(certificateData)
     }
-    let trust = unmanagedTrust!.takeUnretainedValue()
+    let unsafeMutablePointerTrust: UnsafeMutablePointer<SecTrust?> = UnsafeMutablePointer()
+    let status = SecTrustCreateWithCertificates(certificate, SecPolicyCreateBasicX509(), unsafeMutablePointerTrust)
+    if status != 0 {
+        throw Error.SecTrustCreateFailure(status)
+    }
+    guard let trust = unsafeMutablePointerTrust.memory else {
+        throw Error.SecTrustGetFailure(unsafeMutablePointerTrust)
+    }
     let evaluateStatus = SecTrustEvaluate(trust, nil)
-    if (evaluateStatus != 0) {
-        throw RSAErrorType.SecTrustEvaluateFailure(evaluateStatus)
+    if evaluateStatus != 0 {
+        throw Error.SecTrustEvaluateFailure(evaluateStatus)
     }
-    return SecTrustCopyPublicKey(trust).takeUnretainedValue()
+    guard let key = SecTrustCopyPublicKey(trust) else {
+        throw Error.SecTrustCopyPublicKeyFailure(trust)
+    }
+    return key
 }
 
 /// 使用公钥对数据进行加密。
@@ -69,7 +78,7 @@ public func encrypt(data: NSData, publicKey key: SecKeyRef, blockMode: BlockMode
         if (status == noErr){
             encryptedData.appendBytes(cipher, length: Int(cipherLen))
         } else {
-            throw RSAErrorType.SecKeyEncryptFailure(status)
+            throw Error.SecKeyEncryptFailure(status)
         }
     }
     return encryptedData
