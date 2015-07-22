@@ -45,12 +45,12 @@ public func publicKeyFromCertificate(certificateData: NSData) throws -> SecKeyRe
     guard let certificate = SecCertificateCreateWithData(kCFAllocatorDefault, certificateData as CFData) else {
         throw Error.SecCertificateCreateFailure(certificateData)
     }
-    let unsafeMutablePointerTrust: UnsafeMutablePointer<SecTrust?> = UnsafeMutablePointer()
+    let unsafeMutablePointerTrust: UnsafeMutablePointer<SecTrust?> = UnsafeMutablePointer.alloc(1)
     let status = SecTrustCreateWithCertificates(certificate, SecPolicyCreateBasicX509(), unsafeMutablePointerTrust)
     if status != 0 {
         throw Error.SecTrustCreateFailure(status)
     }
-    guard let trust = unsafeMutablePointerTrust.memory else {
+    guard let trust = unsafeMutablePointerTrust.move() else {
         throw Error.SecTrustGetFailure(unsafeMutablePointerTrust)
     }
     let evaluateStatus = SecTrustEvaluate(trust, nil)
